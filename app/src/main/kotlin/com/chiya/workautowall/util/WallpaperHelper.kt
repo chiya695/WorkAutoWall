@@ -24,9 +24,10 @@ class WallpaperHelper(private val context: Context) {
 
     companion object {
         private const val TAG = "WallpaperHelper"
-        private const val BACKUP_FILE_NAME = "wallpaper_backup.jpg"
-        private const val WORK_WALLPAPER_FILE_NAME = "work_wallpaper.jpg"
-        private const val JPEG_QUALITY = 95
+        private const val BACKUP_FILE_NAME = "wallpaper_backup.png"
+        private const val WORK_WALLPAPER_FILE_NAME = "work_wallpaper.png"
+        private const val JPEG_QUALITY = 100
+        private const val MAX_BITMAP_SIZE_MULTIPLIER = 4 // 降采样目标：屏幕分辨率的4倍
     }
 
     private val wallpaperManager = android.app.WallpaperManager.getInstance(context)
@@ -84,7 +85,7 @@ class WallpaperHelper(private val context: Context) {
     /**
      * 备份当前壁纸到私有目录
      *
-     * 将当前系统壁纸以 JPEG 95% 质量保存到 filesDir/wallpaper_backup.jpg
+     * 将当前系统壁纸以 PNG 无损格式保存到 filesDir/wallpaper_backup.png
      *
      * @return true 表示备份成功，false 表示失败
      */
@@ -93,7 +94,7 @@ class WallpaperHelper(private val context: Context) {
             val bitmap = getCurrentWallpaper() ?: return false
             val backupFile = getBackupFile()
             FileOutputStream(backupFile).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, outputStream)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
             bitmap.recycle()
             Log.i(TAG, "Wallpaper backed up to: ${backupFile.absolutePath}")
@@ -108,7 +109,7 @@ class WallpaperHelper(private val context: Context) {
      * 恢复备份壁纸为系统壁纸
      *
      * 读取备份文件，解码并设置为系统壁纸，然后删除备份文件。
-     * 使用 inSampleSize 防止 OOM。
+     * 使用 inSampleSize 防止 OOM，降采样限制为屏幕分辨率的4倍以保持高质量。
      *
      * @return true 表示恢复成功，false 表示失败或无备份
      */
@@ -120,12 +121,12 @@ class WallpaperHelper(private val context: Context) {
                 return false
             }
 
-            // 获取屏幕分辨率，用于降采样
+            // 获取屏幕分辨率，用于降采样（限制为屏幕分辨率的4倍以保持高质量）
             val screenMetrics = getScreenMetrics()
             val bitmap = decodeSampledBitmap(
                 backupFile,
-                screenMetrics.widthPixels * 2,
-                screenMetrics.heightPixels * 2
+                screenMetrics.widthPixels * MAX_BITMAP_SIZE_MULTIPLIER,
+                screenMetrics.heightPixels * MAX_BITMAP_SIZE_MULTIPLIER
             )
 
             if (bitmap == null) {
@@ -198,6 +199,36 @@ class WallpaperHelper(private val context: Context) {
     }
 
     /**
+     * 获取备份文件大小（字节）
+     *
+     * @return 备份文件大小，如果不存在返回 0
+     */
+    fun getBackupFileSize(): Long {
+        return try {
+            val backupFile = getBackupFile()
+            if (backupFile.exists()) backupFile.length() else 0L
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get backup file size", e)
+            0L
+        }
+    }
+
+    /**
+     * 获取工作壁纸文件大小（字节）
+     *
+     * @return 工作壁纸文件大小，如果不存在返回 0
+     */
+    fun getWorkWallpaperFileSize(): Long {
+        return try {
+            val workFile = getWorkWallpaperFile()
+            if (workFile.exists()) workFile.length() else 0L
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get work wallpaper file size", e)
+            0L
+        }
+    }
+
+    /**
      * 检查备份文件是否存在
      *
      * @return true 表示有备份（下班状态），false 表示无备份（上班状态）
@@ -210,6 +241,7 @@ class WallpaperHelper(private val context: Context) {
      * 获取工作壁纸 Bitmap
      *
      * 从私有目录读取工作壁纸文件，使用 inSampleSize 降采样。
+     * 降采样限制为屏幕分辨率的4倍以保持高质量。
      *
      * @return 工作壁纸 Bitmap，文件不存在或读取失败时返回 null
      */
@@ -223,8 +255,8 @@ class WallpaperHelper(private val context: Context) {
             val screenMetrics = getScreenMetrics()
             decodeSampledBitmap(
                 workFile,
-                screenMetrics.widthPixels * 2,
-                screenMetrics.heightPixels * 2
+                screenMetrics.widthPixels * MAX_BITMAP_SIZE_MULTIPLIER,
+                screenMetrics.heightPixels * MAX_BITMAP_SIZE_MULTIPLIER
             )
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get work wallpaper bitmap", e)
@@ -235,9 +267,10 @@ class WallpaperHelper(private val context: Context) {
     /**
      * 从 Uri 保存工作壁纸到私有目录
      *
-     * 从 content:// Uri 读取图片，降采样后保存到 work_wallpaper.jpg
+     * 从 content:// Uri 读取图片，降采样后保存到 work_wallpaper.png（无损格式）
      * 注意：先将 Uri 内容拷贝到临时文件，再从临时文件解码。
      * 避免对同一个 content:// URI 打开两次流（部分 ROM 的 content provider 不支持）。
+     * 降采样限制为屏幕分辨率的4倍以保持高质量。
      *
      * @param uri 图片 Uri
      * @return true 表示保存成功，false 表示失败
@@ -277,8 +310,8 @@ class WallpaperHelper(private val context: Context) {
             val screenMetrics = getScreenMetrics()
             options.inSampleSize = calculateInSampleSize(
                 options,
-                screenMetrics.widthPixels * 2,
-                screenMetrics.heightPixels * 2
+                screenMetrics.widthPixels * MAX_BITMAP_SIZE_MULTIPLIER,
+                screenMetrics.heightPixels * MAX_BITMAP_SIZE_MULTIPLIER
             )
             options.inJustDecodeBounds = false
 
@@ -291,9 +324,9 @@ class WallpaperHelper(private val context: Context) {
                 return false
             }
 
-            // 第四步：保存到工作壁纸文件
+            // 第四步：保存到工作壁纸文件（PNG 无损格式）
             FileOutputStream(workFile).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, outputStream)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
             bitmap.recycle()
 
