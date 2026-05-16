@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">到点换壁纸</string>
+    <string name="settings_title">设置</string>
+    <string name="select_work_wallpaper">选择工作壁纸</string>
+    <string name="delete_backup">删除备份</string>
+    <string name="delay_time_label">延迟退出时间</string>
+    <string name="seconds_format">%d秒</string>
+    <string name="backup_status_yes">当前状态：有备份</string>
+    <string name="backup_status_no">当前状态：无备份</string>
+    <string name="confirm_delete_title">确认删除备份</string>
+    <string name="confirm_delete_message">确定要删除备份壁纸吗？\n删除后将无法恢复原壁纸。</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确定</string>
+    <string name="work_wallpaper_set_success">已切换到工作壁纸</string>
+    <string name="personal_wallpaper_restored">已恢复个人壁纸</string>
+    <string name="no_work_wallpaper_hint">请先在设置中选择工作壁纸</string>
+    <string name="wallpaper_switch_failed">壁纸切换失败，请重试</string>
+    <string name="usage_instructions">使用说明：\n• 上班时打开APP切换工作壁纸\n• 下班时打开APP恢复原壁纸\n• 长按应用图标可直接进入设置界面</string>
+    <string name="work_wallpaper_preview">工作壁纸预览</string>
+    <string name="backup_management">备份管理</string>
+    <string name="usage_title">使用说明</string>
+    <string name="work_wallpaper_save_failed">壁纸保存失败，请重试</string>
+    <string name="no_backup_file_hint">当前没有备份文件</string>
+    <string name="backup_deleted_success">备份已删除</string>
+    <string name="backup_delete_failed">删除失败</string>
+    <string name="content_desc_wallpaper_preview">壁纸预览</string>
+    <string name="permission_denied_hint">需要存储权限才能切换壁纸，请在系统设置中授权</string>
+    <string name="shortcut_settings_short">设置</string>
+    <string name="shortcut_settings_long">打开设置界面</string>
+    <string name="shortcut_settings_disabled">快捷方式不可用</string>
+    <string name="apply_work_wallpaper">手动设置工作壁纸</string>
+    <string name="restore_original_wallpaper">手动恢复原壁纸</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 壁纸切换图标：简单的上下箭头代表切换 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28L54,80"
+        android:strokeWidth="6"
+        android:strokeColor="#FFFFFF" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,44L54,28L70,44"
+        android:strokeWidth="6"
+        android:strokeColor="#FFFFFF" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,64L54,80L70,64"
+        android:strokeWidth="6"
+        android:strokeColor="#FFFFFF" />
+</vector>

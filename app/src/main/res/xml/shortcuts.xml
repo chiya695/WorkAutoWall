@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 长按图标 → 打开设置界面 -->
+    <shortcut
+        android:shortcutId="open_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_shortcut"
+        android:shortcutShortLabel="@string/shortcut_settings_short"
+        android:shortcutLongLabel="@string/shortcut_settings_long"
+        android:shortcutDisabledMessage="@string/shortcut_settings_disabled">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.chiya.workautowall"
+            android:targetClass="com.chiya.workautowall.SettingsActivity" />
+    </shortcut>
+
+</shortcuts>

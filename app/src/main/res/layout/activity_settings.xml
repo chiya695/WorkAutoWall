@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- 标题 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnBackground"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- 壁纸预览区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/work_wallpaper_preview"
+            android:textSize="16sp"
+            android:textColor="@color/colorOnBackground"
+            android:layout_marginBottom="8dp" />
+
+        <ImageView
+            android:id="@+id/ivWallpaperPreview"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:background="@color/colorPlaceholder"
+            android:src="@drawable/ic_placeholder_wallpaper"
+            android:contentDescription="@string/content_desc_wallpaper_preview"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 选择工作壁纸按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSelectWallpaper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/select_work_wallpaper"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 手动设置工作壁纸按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnApplyWorkWallpaper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/apply_work_wallpaper"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
+        <!-- 手动恢复原壁纸按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRestoreOriginalWallpaper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/restore_original_wallpaper"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+        <!-- 分隔线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDisabled"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 备份状态区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/backup_management"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnBackground"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvBackupStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/backup_status_no"
+            android:textSize="14sp"
+            android:textColor="@color/colorOnBackground"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 删除备份按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteBackup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delete_backup"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"
+            app:backgroundTint="@color/colorWarning"
+            android:enabled="false"
+            android:alpha="0.5" />
+
+        <!-- 分隔线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDisabled"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 延迟时间设置区域 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/delay_time_label"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnBackground"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <SeekBar
+                android:id="@+id/seekBarDelay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="5"
+                android:progress="2"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/tvDelayValue"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="7秒"
+                android:textSize="16sp"
+                android:textColor="@color/colorOnBackground"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- 分隔线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDisabled"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 使用说明 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_title"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnBackground"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_instructions"
+            android:textSize="14sp"
+            android:textColor="@color/colorOnBackground"
+            android:lineSpacingMultiplier="1.5"
+            android:layout_marginBottom="32dp" />
+
+    </LinearLayout>
+</ScrollView>
