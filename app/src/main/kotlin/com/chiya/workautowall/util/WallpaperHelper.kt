@@ -26,6 +26,8 @@ class WallpaperHelper(private val context: Context) {
         private const val TAG = "WallpaperHelper"
         private const val BACKUP_FILE_NAME = "wallpaper_backup.png"
         private const val WORK_WALLPAPER_FILE_NAME = "work_wallpaper.png"
+        private const val OLD_BACKUP_FILE_NAME = "wallpaper_backup.jpg"
+        private const val OLD_WORK_WALLPAPER_FILE_NAME = "work_wallpaper.jpg"
         private const val JPEG_QUALITY = 100
         private const val MAX_BITMAP_SIZE_MULTIPLIER = 4 // 降采样目标：屏幕分辨率的4倍
     }
@@ -361,17 +363,59 @@ class WallpaperHelper(private val context: Context) {
     }
 
     /**
-     * 获取备份文件对象
+     * 获取备份文件对象（支持向后兼容旧格式）
+     *
+     * 优先返回新格式文件，如果不存在则检查旧格式并迁移
      */
     private fun getBackupFile(): File {
-        return File(context.filesDir, BACKUP_FILE_NAME)
+        val newFile = File(context.filesDir, BACKUP_FILE_NAME)
+        if (newFile.exists()) {
+            return newFile
+        }
+
+        // 检查旧格式文件
+        val oldFile = File(context.filesDir, OLD_BACKUP_FILE_NAME)
+        if (oldFile.exists()) {
+            Log.i(TAG, "Found old backup file, migrating to new format")
+            // 尝试重命名为新格式
+            if (oldFile.renameTo(newFile)) {
+                Log.i(TAG, "Backup file migrated successfully")
+                return newFile
+            } else {
+                Log.w(TAG, "Failed to rename old backup file, using old file")
+                return oldFile
+            }
+        }
+
+        return newFile
     }
 
     /**
-     * 获取工作壁纸文件对象
+     * 获取工作壁纸文件对象（支持向后兼容旧格式）
+     *
+     * 优先返回新格式文件，如果不存在则检查旧格式并迁移
      */
     private fun getWorkWallpaperFile(): File {
-        return File(context.filesDir, WORK_WALLPAPER_FILE_NAME)
+        val newFile = File(context.filesDir, WORK_WALLPAPER_FILE_NAME)
+        if (newFile.exists()) {
+            return newFile
+        }
+
+        // 检查旧格式文件
+        val oldFile = File(context.filesDir, OLD_WORK_WALLPAPER_FILE_NAME)
+        if (oldFile.exists()) {
+            Log.i(TAG, "Found old work wallpaper file, migrating to new format")
+            // 尝试重命名为新格式
+            if (oldFile.renameTo(newFile)) {
+                Log.i(TAG, "Work wallpaper file migrated successfully")
+                return newFile
+            } else {
+                Log.w(TAG, "Failed to rename old work wallpaper file, using old file")
+                return oldFile
+            }
+        }
+
+        return newFile
     }
 
     /**
