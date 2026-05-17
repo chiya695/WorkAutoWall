@@ -10,6 +10,7 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.WindowManager
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -93,13 +94,19 @@ class WallpaperHelper(private val context: Context) {
      */
     fun backupCurrentWallpaper(): Boolean {
         return try {
-            val bitmap = getCurrentWallpaper() ?: return false
+            val bitmap = getCurrentWallpaper()
+            if (bitmap == null) {
+                Log.e(TAG, "Failed to get current wallpaper for backup")
+                return false
+            }
+            Log.d(TAG, "Current wallpaper bitmap: ${bitmap.width}x${bitmap.height}")
+
             val backupFile = getBackupFile()
             FileOutputStream(backupFile).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
             bitmap.recycle()
-            Log.i(TAG, "Wallpaper backed up to: ${backupFile.absolutePath}")
+            Log.i(TAG, "Wallpaper backed up to: ${backupFile.absolutePath}, size=${backupFile.length()}")
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to backup wallpaper", e)
@@ -118,6 +125,8 @@ class WallpaperHelper(private val context: Context) {
     fun restoreBackupWallpaper(): Boolean {
         return try {
             val backupFile = getBackupFile()
+            Log.i(TAG, "Restoring backup from: ${backupFile.absolutePath}, exists=${backupFile.exists()}, size=${if (backupFile.exists()) backupFile.length() else 0}")
+
             if (!backupFile.exists()) {
                 Log.w(TAG, "Backup file not found")
                 return false
@@ -125,6 +134,8 @@ class WallpaperHelper(private val context: Context) {
 
             // 获取屏幕分辨率，用于降采样（限制为屏幕分辨率的4倍以保持高质量）
             val screenMetrics = getScreenMetrics()
+            Log.d(TAG, "Screen metrics: ${screenMetrics.widthPixels}x${screenMetrics.heightPixels}")
+
             val bitmap = decodeSampledBitmap(
                 backupFile,
                 screenMetrics.widthPixels * MAX_BITMAP_SIZE_MULTIPLIER,
@@ -132,14 +143,17 @@ class WallpaperHelper(private val context: Context) {
             )
 
             if (bitmap == null) {
-                Log.e(TAG, "Failed to decode backup bitmap")
+                Log.e(TAG, "Failed to decode backup bitmap from: ${backupFile.absolutePath}")
                 return false
             }
+
+            Log.d(TAG, "Decoded bitmap: ${bitmap.width}x${bitmap.height}")
 
             var setSuccess = false
             try {
                 wallpaperManager.setBitmap(bitmap)
                 setSuccess = true
+                Log.i(TAG, "Wallpaper set via setBitmap()")
             } catch (e: SecurityException) {
                 Log.w(TAG, "setBitmap blocked, trying setStream fallback", e)
                 try {
@@ -147,6 +161,7 @@ class WallpaperHelper(private val context: Context) {
                         wallpaperManager.setStream(stream)
                     }
                     setSuccess = true
+                    Log.i(TAG, "Wallpaper set via setStream()")
                 } catch (e2: Exception) {
                     Log.e(TAG, "Stream fallback also failed", e2)
                 }
@@ -365,56 +380,78 @@ class WallpaperHelper(private val context: Context) {
     /**
      * 获取备份文件对象（支持向后兼容旧格式）
      *
-     * 优先返回新格式文件，如果不存在则检查旧格式并迁移
+     * 优先返回新格式文件，如果不存在则检查旧格式并迁移。
+     * 迁移策略：先尝试 renameTo()，失败时使用文件复制（更稳健）。
      */
     private fun getBackupFile(): File {
         val newFile = File(context.filesDir, BACKUP_FILE_NAME)
         if (newFile.exists()) {
+            Log.d(TAG, "Backup file found: ${newFile.absolutePath}")
             return newFile
         }
 
         // 检查旧格式文件
         val oldFile = File(context.filesDir, OLD_BACKUP_FILE_NAME)
         if (oldFile.exists()) {
-            Log.i(TAG, "Found old backup file, migrating to new format")
+            Log.i(TAG, "Found old backup file: ${oldFile.absolutePath}, size=${oldFile.length()}")
             // 尝试重命名为新格式
             if (oldFile.renameTo(newFile)) {
-                Log.i(TAG, "Backup file migrated successfully")
+                Log.i(TAG, "Backup file migrated via rename: ${newFile.absolutePath}")
                 return newFile
             } else {
-                Log.w(TAG, "Failed to rename old backup file, using old file")
-                return oldFile
+                Log.w(TAG, "renameTo() failed, trying file copy...")
+                // 降级方案：文件复制
+                if (copyFile(oldFile, newFile)) {
+                    Log.i(TAG, "Backup file migrated via copy: ${newFile.absolutePath}")
+                    oldFile.delete() // 删除旧文件
+                    return newFile
+                } else {
+                    Log.e(TAG, "File copy also failed, using old file as-is")
+                    return oldFile
+                }
             }
         }
 
+        Log.d(TAG, "No backup file found (neither new nor old format)")
         return newFile
     }
 
     /**
      * 获取工作壁纸文件对象（支持向后兼容旧格式）
      *
-     * 优先返回新格式文件，如果不存在则检查旧格式并迁移
+     * 优先返回新格式文件，如果不存在则检查旧格式并迁移。
+     * 迁移策略：先尝试 renameTo()，失败时使用文件复制（更稳健）。
      */
     private fun getWorkWallpaperFile(): File {
         val newFile = File(context.filesDir, WORK_WALLPAPER_FILE_NAME)
         if (newFile.exists()) {
+            Log.d(TAG, "Work wallpaper file found: ${newFile.absolutePath}")
             return newFile
         }
 
         // 检查旧格式文件
         val oldFile = File(context.filesDir, OLD_WORK_WALLPAPER_FILE_NAME)
         if (oldFile.exists()) {
-            Log.i(TAG, "Found old work wallpaper file, migrating to new format")
+            Log.i(TAG, "Found old work wallpaper file: ${oldFile.absolutePath}, size=${oldFile.length()}")
             // 尝试重命名为新格式
             if (oldFile.renameTo(newFile)) {
-                Log.i(TAG, "Work wallpaper file migrated successfully")
+                Log.i(TAG, "Work wallpaper file migrated via rename: ${newFile.absolutePath}")
                 return newFile
             } else {
-                Log.w(TAG, "Failed to rename old work wallpaper file, using old file")
-                return oldFile
+                Log.w(TAG, "renameTo() failed, trying file copy...")
+                // 降级方案：文件复制
+                if (copyFile(oldFile, newFile)) {
+                    Log.i(TAG, "Work wallpaper file migrated via copy: ${newFile.absolutePath}")
+                    oldFile.delete() // 删除旧文件
+                    return newFile
+                } else {
+                    Log.e(TAG, "File copy also failed, using old file as-is")
+                    return oldFile
+                }
             }
         }
 
+        Log.d(TAG, "No work wallpaper file found (neither new nor old format)")
         return newFile
     }
 
@@ -501,6 +538,28 @@ class WallpaperHelper(private val context: Context) {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to decode sampled bitmap", e)
             null
+        }
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param source 源文件
+     * @param dest 目标文件
+     * @return true 表示复制成功，false 表示失败
+     */
+    private fun copyFile(source: File, dest: File): Boolean {
+        return try {
+            FileInputStream(source).use { input ->
+                FileOutputStream(dest).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            Log.i(TAG, "File copied: ${source.absolutePath} -> ${dest.absolutePath}")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to copy file: ${source.absolutePath} -> ${dest.absolutePath}", e)
+            false
         }
     }
 }
