@@ -204,8 +204,8 @@ class SettingsActivity : AppCompatActivity() {
 
         val success = wallpaperHelper.saveWorkWallpaperFromUri(uri)
         if (success) {
-            // 保存路径到配置
-            val workFile = filesDir.resolve("work_wallpaper.jpg")
+            // 保存路径到配置（使用 .png 格式，与 saveWorkWallpaperFromUri 一致）
+            val workFile = filesDir.resolve("work_wallpaper.png")
             preferences.setWorkWallpaperPath(workFile.absolutePath)
 
             // 刷新预览

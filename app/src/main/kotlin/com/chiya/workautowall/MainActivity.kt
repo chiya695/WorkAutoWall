@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun handleWorkMode() {
         // 检查是否已设置工作壁纸
-        val workWallpaperPath = preferences.getWorkWallpaperPath()
+        var workWallpaperPath = preferences.getWorkWallpaperPath()
         Log.d(TAG, "Work wallpaper path: $workWallpaperPath")
 
         if (workWallpaperPath.isNullOrEmpty()) {
@@ -261,8 +261,17 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // 检查工作壁纸文件是否存在
-        val workFile = java.io.File(workWallpaperPath)
+        // 检查工作壁纸文件是否存在，不存在时尝试自动修正路径（.jpg ↔ .png 兼容）
+        var workFile = java.io.File(workWallpaperPath)
+        if (!workFile.exists()) {
+            val correctedPath = tryAlternativeExtension(workWallpaperPath)
+            if (correctedPath != null) {
+                Log.i(TAG, "Auto-correcting work wallpaper path: $workWallpaperPath -> $correctedPath")
+                preferences.setWorkWallpaperPath(correctedPath)
+                workFile = java.io.File(correctedPath)
+            }
+        }
+
         if (!workFile.exists()) {
             Log.e(TAG, "Work wallpaper file does not exist: $workWallpaperPath")
             preferences.setWorkWallpaperPath("")
@@ -372,6 +381,26 @@ class MainActivity : AppCompatActivity() {
     private fun showErrorAndExit(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         finish()
+    }
+
+    /**
+     * 尝试使用替代扩展名查找文件
+     *
+     * 用于 .jpg ↔ .png 的向后兼容：当存储的路径指向 .jpg 文件但实际文件是 .png 时，
+     * 自动切换到正确的扩展名。
+     *
+     * @param path 原始文件路径
+     * @return 修正后的路径（文件存在时），否则 null
+     */
+    private fun tryAlternativeExtension(path: String): String? {
+        val file = java.io.File(path)
+        val alternativePath = when {
+            path.endsWith(".jpg", ignoreCase = true) -> path.dropLast(4) + ".png"
+            path.endsWith(".png", ignoreCase = true) -> path.dropLast(4) + ".jpg"
+            else -> return null
+        }
+        val alternativeFile = java.io.File(alternativePath)
+        return if (alternativeFile.exists()) alternativePath else null
     }
 
     override fun onDestroy() {
