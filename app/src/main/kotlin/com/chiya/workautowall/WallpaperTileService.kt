@@ -73,26 +73,6 @@ class WallpaperTileService : TileService() {
     }
 
     /**
-     * 长按磁贴进入设置界面
-     *
-     * 当用户长按磁贴时，系统会调用此方法。
-     * 我们重写此方法以启动 SettingsActivity 而不是主 Activity。
-     */
-    override fun startActivityAndCollapse(intent: Intent) {
-        // 创建指向 SettingsActivity 的 Intent
-        // 使用自定义 action 确保启动 SettingsActivity
-        val settingsIntent = Intent("com.chiya.workautowall.OPEN_SETTINGS").apply {
-            // 添加标志，确保在新任务中启动
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-
-        // 启动 SettingsActivity
-        // 注意：在 API 34+ 中，startActivityAndCollapse(Intent) 已被弃用
-        // 但为了兼容性，我们仍然使用它
-        super.startActivityAndCollapse(settingsIntent)
-    }
-
-    /**
      * 更新磁贴状态
      *
      * 根据备份文件存在性更新磁贴图标和状态：
