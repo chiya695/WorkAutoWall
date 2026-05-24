@@ -39,8 +39,30 @@
         <!-- 设置Activity -->
         <activity
             android:name=".SettingsActivity"
-            android:exported="false"
-            android:label="@string/settings_title" />
+            android:exported="true"
+            android:label="@string/settings_title">
+            <!-- 允许磁贴服务长按启动 -->
+            <intent-filter>
+                <action android:name="com.chiya.workautowall.OPEN_SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- 快捷设置磁贴服务 -->
+        <service
+            android:name=".WallpaperTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_switch"
+            android:label="@string/tile_label_switch"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <!-- 长按磁贴进入设置界面 -->
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+        </service>
 
     </application>
 

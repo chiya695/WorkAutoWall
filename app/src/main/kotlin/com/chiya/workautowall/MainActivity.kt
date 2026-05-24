@@ -153,6 +153,15 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // 检测是否来自快捷方式（打开设置界面）
+        // 如果是快捷方式启动，直接跳转设置界面，不执行壁纸切换
+        val fromShortcut = intent.getBooleanExtra("from_shortcut", false)
+        if (fromShortcut) {
+            Log.i(TAG, "Launched from shortcut, navigating to settings without wallpaper switch")
+            navigateToSettings()
+            return
+        }
+
         // 检查存储读取权限，然后执行壁纸切换逻辑
         checkStoragePermissionAndProceed()
     }

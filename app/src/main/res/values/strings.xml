@@ -16,7 +16,7 @@
     <string name="personal_wallpaper_restored">已恢复个人壁纸</string>
     <string name="no_work_wallpaper_hint">请先在设置中选择工作壁纸</string>
     <string name="wallpaper_switch_failed">壁纸切换失败，请重试</string>
-    <string name="usage_instructions">使用说明：\n• 上班时打开APP切换工作壁纸\n• 下班时打开APP恢复原壁纸\n• 长按应用图标可直接进入设置界面</string>
+    <string name="usage_instructions">使用说明：\n• 上班时打开APP切换工作壁纸\n• 下班时打开APP恢复原壁纸\n• 长按应用图标可直接进入设置界面\n• 下拉通知栏点击磁贴快速切换\n• 长按磁贴进入设置界面</string>
     <string name="work_wallpaper_preview">工作壁纸预览</string>
     <string name="backup_management">备份管理</string>
     <string name="usage_title">使用说明</string>
@@ -31,4 +31,10 @@
     <string name="shortcut_settings_disabled">快捷方式不可用</string>
     <string name="apply_work_wallpaper">手动设置工作壁纸</string>
     <string name="restore_original_wallpaper">手动恢复原壁纸</string>
+
+    <!-- 快捷设置磁贴相关 -->
+    <string name="tile_label_switch">切换壁纸</string>
+    <string name="tile_label_restore">恢复壁纸</string>
+    <string name="tile_content_desc_switch">点击切换到工作壁纸</string>
+    <string name="tile_content_desc_restore">点击恢复个人壁纸</string>
 </resources>

@@ -12,7 +12,11 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.chiya.workautowall"
-            android:targetClass="com.chiya.workautowall.SettingsActivity" />
+            android:targetClass="com.chiya.workautowall.SettingsActivity">
+            <extra
+                android:name="from_shortcut"
+                android:value="true" />
+        </intent>
     </shortcut>
 
 </shortcuts>
